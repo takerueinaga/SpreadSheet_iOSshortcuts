@@ -1,0 +1,58 @@
+function doPost(e) {
+  // iPhoneから送られてきたJSONデータを解析
+  var params = JSON.parse(e.postData.getDataAsString());
+  
+  // 各データを変数に格納
+  var tweet   = params.tweet; 
+  var tweeter = params.tweeter;
+  var note    = params.note;
+
+    var maintext  = tweet.maintext;
+    var tweetURL  = tweet.tweetURL;
+    var tweettime = tweet.tweettime;
+    var category  = tweet.category;
+
+    var username  = tweeter.username;
+    var userID    = tweeter.userID;
+
+  // レスポンス用変数
+  var result = {};
+  var output = ContentService.createTextOutput();
+  output.setMimeType(ContentService.MimeType.JSON);
+
+  // 必要なデータがすべて揃っているか確認
+  if (tweet && tweeter && note) {
+    // データをスプレッドシートに記録
+    var dataArray = [tweetURL,category]
+    addLog(dataArray);
+
+    // 成功メッセージ
+    result = {
+      "success": {
+        "message": "スプレッドシートへの記録が完了"
+      }
+    };
+  } else {
+    // エラーメッセージ
+    result = {
+      "error": {
+        "message": "データが不足しています"
+      }
+    };
+  }
+
+  // ショートカットにメッセージを返す
+  output.setContent(JSON.stringify(result));
+  return output;
+}
+
+// スプレッドシートへの記録関数
+function addLog(dataArray) {
+  var spreadsheetId = "1gWdUy8pgml2ymXxjqxs9DAScVshbUwDrH05izHRaPsM";
+  var sheetName = "Twitter";
+  var spreadsheet = SpreadsheetApp.openById(spreadsheetId);
+  var sheet = spreadsheet.getSheetByName(sheetName);
+
+  // データをスプレッドシートに追加
+  sheet.appendRow(dataArray);//dataArrayリストを入力
+}
