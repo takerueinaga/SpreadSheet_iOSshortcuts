@@ -1,1 +1,3 @@
 # SpreadSheet_iOSshortcuts
+iOSショートカットを用いて，Googleスプレッドシートに書き込むコード
+特にツイッターURLをSSに保存するのを広い目的とした
