@@ -1,0 +1,51 @@
+function doPost(e) {
+  // iPhone（ショートカット）から送られてきた情報を取得
+  var params = JSON.parse(e.postData.getDataAsString());
+  var locationData = params.location.value;
+  // ショートカットに返すメッセージを格納する為の変数
+  var result = {};
+  var output = ContentService.createTextOutput();
+  output.setMimeType(ContentService.MimeType.JSON);
+
+  // 情報が問題なく送られてきてるかの判定
+  if (locationData){
+    result = {
+      "success" : {
+        "message" : "スプレッドシートへの記録が完了"
+      }
+    };
+    // 情報があればスプレッドシートへ記録する
+    addLog( JSON.stringify(locationData) );
+  } else {
+    result = {
+      "error": {
+        "message": "データがありません"
+      }
+    };
+  }
+
+  // ショートカットにメッセージを返す
+  output.setContent(JSON.stringify(result));
+  return output;
+}
+
+
+function addLog(text) {
+
+  // 記録するスプレッドシートを指定
+  var spreadsheetId = "1gWdUy8pgml2ymXxjqxs9DAScVshbUwDrH05izHRaPsM"; //★自分のスプレッドシートのIDを入力
+  var sheetName     = "シート1"; // ★指定のスプレッドシート名を入力
+  var spreadsheet   = SpreadsheetApp.openById(spreadsheetId);
+  var sheet         = spreadsheet.getSheetByName(sheetName);
+
+  // 記録する箇所の列幅を指定
+  var firstColumnSize  = 150; // １列目の列幅
+  var secondColumnSize = 350; // ２列目の列幅
+  sheet.setColumnWidth(1,firstColumnSize);
+  sheet.setColumnWidth(2,secondColumnSize);
+  
+  // ショートカットから送信された情報をスプレッドシートに記録
+  sheet.appendRow([new Date(),text]);
+  var range = sheet.getDataRange();
+  range.setHorizontalAlignment("left"); // 文字を左揃えに統一
+}
